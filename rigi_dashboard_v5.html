@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RIGI – Dashboard EcoGo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{color-scheme:light;
+  --bg:#f1f1f1;--card:#fff;--text:#333333;--muted:#718096;--border:#d1d5db;
+  --c1:#1B5F5E;--c2:#3c9794;--c3:#8FCCCA;--cbo:#1B5F5E;--cann:#8FCCCA;--crev:#FEB15F;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'HK Grotesk','Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:12.5px;}
+a{color:var(--c2);}a:hover{text-decoration:underline;}
+.hdr{background:var(--c1);color:#fff;padding:.75rem 1.75rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+.hdr-left{display:flex;align-items:center;gap:.9rem;}
+.hdr-logo{height:44px;width:auto;border-radius:3px;}
+.hdr-t{font-size:1.05rem;font-weight:800;}.hdr-s{font-size:.66rem;opacity:.7;margin-top:.1rem;}
+.hdr-tag{background:rgba(255,255,255,.18);border-radius:999px;padding:.18rem .7rem;font-size:.66rem;font-weight:700;white-space:nowrap;}
+main{padding:.95rem 1.6rem;max-width:1440px;margin:0 auto;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin-bottom:1.1rem;}
+.kpi{background:var(--card);border-radius:7px;padding:.65rem .85rem;border-left:3px solid var(--c2);box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.kpi.k1{border-color:#6b46c1}.kpi.k2{border-color:var(--cbo)}.kpi.k3{border-color:var(--c2)}.kpi.k4{border-color:var(--crev)}.kpi.k5{border-color:#84BF84}
+.kpi-l{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:.15rem;}
+.kpi-v{font-size:1.25rem;font-weight:800;line-height:1.1;}
+.kpi-s{font-size:.59rem;color:var(--muted);margin-top:.1rem;}
+.sec-t{font-size:.8rem;font-weight:800;color:var(--c1);margin-bottom:.55rem;padding-bottom:.28rem;border-bottom:2px solid var(--c3);}
+.tbl-wrap{border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:.35rem;}
+.tbl-note{font-size:.58rem;color:var(--muted);margin-bottom:1rem;margin-top:.22rem;line-height:1.55;}
+table{width:100%;border-collapse:collapse;font-size:.67rem;}
+thead th{background:var(--c1);color:#fff;padding:.3rem .52rem;text-align:left;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+thead th.num{text-align:right;}
+td{padding:.25rem .52rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:#f0fafa;}
+tfoot td{background:#e4f2f1;font-weight:700;border-top:2px solid var(--c3);}
+.tfoot-row td{background:#e4f2f1;font-weight:700;border-top:2px solid var(--c3);}
+.sap{display:inline-block;background:#d1fae5;color:#065f46;border-radius:999px;padding:.07rem .35rem;font-size:.57rem;font-weight:700;white-space:nowrap;}
+.srev{display:inline-block;background:#fef3c7;color:#92400e;border-radius:999px;padding:.07rem .35rem;font-size:.57rem;font-weight:700;white-space:nowrap;}
+.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+.mu{color:var(--muted);}
+.lb{display:inline-flex;align-items:center;font-size:.59rem;color:var(--c2);padding:.07rem .26rem;border-radius:3px;border:1px solid var(--border);}
+.lb:hover{background:var(--bg);}
+.tables-grid{display:grid;grid-template-columns:1fr 1fr;gap:.95rem;margin-bottom:1.1rem;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.95rem;margin-bottom:.85rem;}
+.chart-card{background:var(--card);border-radius:7px;padding:.95rem;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.chart-t{font-size:.8rem;font-weight:800;color:var(--c1);margin-bottom:.1rem;}
+.chart-s{font-size:.62rem;color:var(--muted);margin-bottom:.65rem;}
+.legend{display:flex;align-items:center;gap:.95rem;flex-wrap:wrap;margin-bottom:.65rem;}
+.leg{display:flex;align-items:center;gap:.28rem;font-size:.65rem;color:var(--muted);}
+.dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.leg-note{margin-left:auto;font-size:.6rem;color:var(--muted);font-style:italic;}
+#det-panel{background:var(--card);border-radius:7px;padding:.95rem;box-shadow:0 1px 3px rgba(0,0,0,.07);display:none;margin-top:.85rem;}
+#det-panel.on{display:block;}
+.det-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:.5rem;border-bottom:1px solid var(--border);margin-bottom:.65rem;}
+.det-t{font-size:.8rem;font-weight:800;}
+.close-btn{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:.08rem .2rem;border-radius:3px;line-height:1;}
+.close-btn:hover{background:var(--bg);}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr);}.charts-grid,.tables-grid{grid-template-columns:1fr;}main{padding:.75rem;}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <img class="hdr-logo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAA0ADQDASIAAhEBAxEB/8QAGwABAAIDAQEAAAAAAAAAAAAAAAUGAgMEAQj/xAAtEAABBAEBBQcFAQEAAAAAAAABAAIDBBEFEiExUWEGExQigZHRI0FSccEyQv/EABoBAAEFAQAAAAAAAAAAAAAAAAABAgMFBgT/xAAoEQABAwMDAgYDAAAAAAAAAAABAAIRAwQhBRJBEzEyUWGBkfBx4fH/2gAMAwEAAhEDEQA/APstYyyRxRmSV4YxvEkrJVLW77rlkta76LDhg59U17toVfqN+2zp7oknsFJWe0EbXFteAvH5OOB7LQztDKD56zCOjiFCKVraSzwYtXbIrsdvaMb+ihD3k4WapajqFy89N3bPAA+VN6fqda6dljiyT8HcfTmu1Vqvo4ftzQ3A6No2o5GcdrkeSltEu+Nphz8d6zyv69VK1xOCtBYXlV8U7gQ4zB84++670RE9Wq0ai8x0J3jiI3Eeyq+i0RdtbDyRGwZdjieitdmPvq0kX5tLfcKv9mZRBdlry+V7xgZ5g8FE8S4SqDU6Tal5RFTwmfn94QWNJda8L4BvdF2x3md/LK2dpmyCGFu8sjcd/Qjdn2ISSTW22nQtia7zbnCIbJHPK3zP1asXO2IrgcAHYZ/k8sDiEnBC5Y30alNwInkMAj0gHK19mGvFOy4g7Dj5epxv/i5+yjyLsjPs6PJ9CPlSFKa02nas3m903HkZjAAA5fsrj7JwO25bBG4AMH74n+IAy1OpU9tW1Yycbu+DH49VYURFMtOihNd0p8rzaqjMn/bB9+o6qbRI5ocIK5rq1p3VPp1P4qYb19oMZtTDG4gneP6sILlqDPdWJGZOTv4qz2H0p3OE1YPLSRlzRndy+FqbBpcbWSim3zHAyM/f94Poodh81mnaZW3S2vgcyZ++6h68Woaq8NdLI6MHe93+R8lWepXjq12QRDDWj1PVKsrJY/pt2WtOMY+FtUjGxlXmn2LKA6m7c48lERE9WSIiIQi8c1rsbTQcbxkcERCSJXqIiEqIiIQv/9k=" alt="EcoGo">
+    <div><div class="hdr-t">RIGI — Proyectos de Inversión</div>
+    <div class="hdr-s">Régimen de Incentivo para Grandes Inversiones · República Argentina</div></div>
+  </div>
+  <div class="hdr-tag">Montos en mill. USD</div>
+</div>
+<main>
+<div class="kpi-row">
+  <div class="kpi k1"><div class="kpi-l">Proyectos totales</div><div class="kpi-v">34</div><div class="kpi-s">14 aprobados · 20 en revisión</div></div>
+  <div class="kpi k2"><div class="kpi-l">Aprobados — Bol. oficial</div><div class="kpi-v">17.199</div><div class="kpi-s">mill. USD</div></div>
+  <div class="kpi k3"><div class="kpi-l">Aprobados — Anunciado</div><div class="kpi-v">27.473</div><div class="kpi-s">mill. USD</div></div>
+  <div class="kpi k4"><div class="kpi-l">En revisión — Anunciado</div><div class="kpi-v">51.911</div><div class="kpi-s">mill. USD</div></div>
+  <div class="kpi k5"><div class="kpi-l">Primeros 2 años (aprobados)*</div><div class="kpi-v">5.864</div><div class="kpi-s">mill. USD</div></div>
+</div>
+<div class="sec-t">Proyectos RIGI</div>
+<div class="tbl-wrap"><table>
+<thead><tr>
+  <th>Estado</th><th>Empresa</th><th>Proyecto</th><th>Provincia</th><th>Sector</th>
+  <th class="num">Bol. oficial</th><th class="num">Inv. anunciada</th>
+  <th>F. adhesión</th><th>Resolución</th><th>F. aprobación</th>
+  <th class="num">Primeros 2 años *</th><th>Link</th>
+</tr></thead>
+<tbody id="main-tbody"></tbody>
+<tfoot><tr><td colspan="5">Total aprobados</td>
+  <td class="num" id="tot-bo">—</td><td class="num" id="tot-ann">—</td>
+  <td colspan="3">—</td><td class="num" id="tot-p2y">—</td><td></td>
+</tr></tfoot>
+</table></div>
+<div class="tbl-note">
+  * Inversión en activos computables para el primer y segundo año desde la fecha de adhesión, según lo expresado en la resolución de aprobación.<br>
+  *** Resolución de aprobación aún no publicada en el Boletín Oficial al momento de la última actualización.
+</div>
+<div class="tables-grid">
+  <div>
+    <div class="sec-t">Resumen por Sector</div>
+    <div class="tbl-wrap"><table>
+    <thead><tr><th>Sector</th><th class="num">Aprobados — Bol. oficial</th>
+    <th class="num">Aprobados — Anunciado</th><th class="num">En revisión</th><th class="num">Primeros 2 años *</th></tr></thead>
+    <tbody id="sec-tbody"></tbody><tfoot><tr class="tfoot-row" id="sec-tfoot"></tr></tfoot>
+    </table></div>
+  </div>
+  <div>
+    <div class="sec-t">Resumen por Provincia **</div>
+    <div class="tbl-wrap"><table>
+    <thead><tr><th>Provincia</th><th class="num">Aprobados — Bol. oficial</th>
+    <th class="num">Aprobados — Anunciado</th><th class="num">En revisión</th><th class="num">Primeros 2 años *</th></tr></thead>
+    <tbody id="prov-tbody"></tbody><tfoot><tr class="tfoot-row" id="prov-tfoot"></tr></tfoot>
+    </table></div>
+    <div class="tbl-note">** Proyectos con múltiples provincias tienen sus montos divididos en partes iguales entre las provincias involucradas.</div>
+  </div>
+</div>
+<div class="legend">
+  <div class="leg"><div class="dot" style="background:#8FCCCA"></div>Aprobados (Anunciado)</div>
+  <div class="leg"><div class="dot" style="background:#1B5F5E"></div>Aprobados (Boletín oficial)</div>
+  <div class="leg"><div class="dot" style="background:#FEB15F"></div>En revisión</div>
+  <div class="leg-note">Clic en cualquier barra para ver todos los proyectos</div>
+</div>
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-t">Inversión por Sector</div>
+    <div class="chart-s">Mill. USD</div>
+    <div style="position:relative;height:280px;"><canvas id="chart-sec"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-t">Inversión por Provincia **</div>
+    <div class="chart-s">Mill. USD</div>
+    <div style="position:relative;height:490px;"><canvas id="chart-prov"></canvas></div>
+  </div>
+</div>
+<div id="det-panel">
+  <div class="det-hdr">
+    <div><div class="det-t" id="det-title">Proyectos</div>
+    <div id="det-sub" style="font-size:.65rem;color:var(--muted);margin-top:.1rem;"></div></div>
+    <button class="close-btn" onclick="closePanel()">×</button>
+  </div>
+  <div id="det-body"></div>
+</div>
+</main>
+<script>
+const APPROVED=[
+  {e:"YPF Luz, Luz de Campo S.A.",proj:"El Quemado",prov:"Mendoza",sec:"Energía",bo:211.6,ann:211.6,p2y:204.5,resol:"1/25",fadh:"16/12/2024",fapr:"07/01/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/319374/20250108?busqueda=1"},
+  {e:"YPF, PAE, Pluspetrol, Vista, Pampa Energía, Chevron y Shell",proj:"Vaca Muerta Oleoductor Sur (VMOS)",prov:"Río Negro",sec:"Energía",bo:2486,ann:2900,p2y:2441,resol:"302/25",fadh:"06/03/2025",fapr:"20/03/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/322830/20250321?busqueda=1"},
+  {e:"Southern Energy, Golar, PAE",proj:"Vaca Muerta (GNL)",prov:"Río Negro",sec:"Energía",bo:6878,ann:15200,p2y:459,resol:"559/25",fadh:"28/04/2025",fapr:"29/04/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/324772/20250505?busqueda=1"},
+  {e:"Rio Tinto",proj:"Proyecto Rincón",prov:"Salta",sec:"Minería",bo:2744,ann:2744,p2y:1293.5,resol:"735/25",fadh:"19/05/2025",fapr:"30/05/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/326364/20250603?busqueda=1"},
+  {e:"Galán Lithium",proj:"Hombre Muerto Oeste (HMW)",prov:"Catamarca",sec:"Minería",bo:217.1,ann:217.1,p2y:51.5,resol:"1271/25",fadh:"17/07/2025",fapr:"27/08/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/330470/20250828?busqueda=1"},
+  {e:"Sidersa",proj:"Acero Verde",prov:"Buenos Aires",sec:"Industrial",bo:286.3,ann:286.3,p2y:270.2,resol:"1028/25",fadh:"30/05/2025",fapr:"21/07/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/328690/20250722?busqueda=1"},
+  {e:"PCR, Acindar",proj:"Parque Eólico Olavarría",prov:"Buenos Aires",sec:"Energía",bo:275.6,ann:275.6,p2y:216.5,resol:"1254/25",fadh:"25/07/2025",fapr:"26/08/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/330400/20250827?busqueda=1"},
+  {e:"Andes Corporación Minera SA",proj:"Los Azules",prov:"San Juan",sec:"Minería",bo:2672.2,ann:2672.2,p2y:415.8,resol:"1553/25",fadh:"25/09/2025",fapr:"13/10/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/332807/20251014?busqueda=1"},
+  {e:"Terminales y Servicios SA",proj:"Puerto Timbues",prov:"Santa Fe",sec:"Otros",bo:276.9,ann:276.9,p2y:165.9,resol:"1842/25",fadh:"23/10/2025",fapr:"19/11/2025",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/334814/20251120?busqueda=1"},
+  {e:"Minas Argentina S.A.",proj:"Carbonatos Profundos (DCP)",prov:"San Juan",sec:"Minería",bo:519.6,ann:519.6,p2y:90.6,resol:"6/26",fadh:"27/11/2025",fapr:"13/01/2026",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/337468/20260115?busqueda=1"},
+  {e:"Barrick, Shandong",proj:"Veladero",prov:"San Juan",sec:"Minería",bo:380,ann:380,p2y:162.4,resol:"413/26",fadh:"—",fapr:"30/03/2026",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/340249/20260401?busqueda=1"},
+  {e:"Rio Tinto",proj:"Expansión Fase 1B Fenix",prov:"Catamarca",sec:"Minería",bo:251.3,ann:530,p2y:92.7,resol:"431/26",fadh:"—",fapr:"31/03/2026",link:"https://www.boletinoficial.gob.ar/detalleAviso/primera/340329/20260406?busqueda=1"},
+  {e:"AbraSilver Resource Corp.",proj:"Diablillos ***",prov:"Salta y Catamarca",sec:"Minería",bo:null,ann:760,p2y:null,resol:"—",fadh:"—",fapr:"—",link:"",nobo:true},
+  {e:"TGS",proj:"Ampliación del GPM ***",prov:"La Pampa",sec:"Energía",bo:null,ann:500,p2y:null,resol:"—",fadh:"—",fapr:"—",link:"",nobo:true},
+];
+const REVISION=[
+  {e:"Posco",proj:"Sal de Oro",prov:"Salta y Catarmarca",sec:"Minería",ann:633},
+  {e:"Rio Tinto Lithium",proj:"Sal de Vida",prov:"Catamarca",sec:"Minería",ann:678},
+  {e:"La Rinconada",proj:"La Rinconada",prov:"Buenos Aires",sec:"Energía",ann:200},
+  {e:"NRG",proj:"Arenas de Cercanía",prov:"Río Negro, Entre Ríos",sec:"Minería",ann:200},
+  {e:"Glencore",proj:"El Pachón",prov:"San Juan",sec:"Minería",ann:11600},
+  {e:"Glencore",proj:"Agua Rica",prov:"Catamarca",sec:"Minería",ann:6700},
+  {e:"PAE",proj:"Gasoducto Dedicado PAE",prov:"Río Negro, Neuquén",sec:"Energía",ann:1300},
+  {e:"Xizanf Zhufeng Resources Co.",proj:"Litio Ángeles Argentina",prov:"Salta",sec:"Minería",ann:700},
+  {e:"Nuevo Central Argentino S.A.",proj:"NCA+",prov:"Bs. As., Santa Fe, Sgo. del Estero y Chaco",sec:"Otros",ann:200},
+  {e:"Pluspetrol",proj:"Choique-La Invernada",prov:"Neuquén",sec:"Energía",ann:400},
+  {e:"Zonda Metals y Grupo Alberdi",proj:"San Jorge",prov:"Mendoza",sec:"Minería",ann:600},
+  {e:"BHP y Lundin Mining",proj:"Vicuña",prov:"San Juan",sec:"Minería",ann:9700},
+  {e:"Minera Exar S.A.",proj:"Ampliación Cauchari Olaroz",prov:"Jujuy",sec:"Minería",ann:1200},
+  {e:"Salterra S.A.",proj:"Salterra",prov:"Catamarca",sec:"Minería",ann:700},
+  {e:"Varios",proj:"Pozuelos Pastor Grandes",prov:"Salta",sec:"Minería",ann:4200},
+  {e:"Varios",proj:"Duplicar Norte",prov:"Neuquén",sec:"Energía",ann:400},
+  {e:"Pampa Energía",proj:"Rincón de Aranda",prov:"Neuquén",sec:"Energía",ann:4500},
+  {e:"Varios",proj:"Ampliación Mega",prov:"Neuquén, La Pampa, Río Negro",sec:"Energía",ann:400},
+  {e:"Tecpetrol",proj:"Los Toldos",prov:"Neuquén",sec:"Energía",ann:6400},
+  {e:"Varias",proj:"Jama Solaroz",prov:"Jujuy",sec:"Minería",ann:1200},
+];
+const R=(n,d=1)=>n!=null?Math.round(n*Math.pow(10,d))/Math.pow(10,d):0;
+const FMT=v=>v!=null&&v>0?R(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';
+const PROV_FIX={'Bs. As.':'Buenos Aires','Sgo. del Estero':'Santiago del Estero','Catarmarca':'Catamarca','Nequén':'Neuquén','San Nicolás (Bs As)':'Buenos Aires','Olavarría (Bs As)':'Buenos Aires','Calingasta (San Juan)':'San Juan'};
+function normPart(p){return PROV_FIX[p.trim()]||p.trim();}
+function splitProv(s){
+  if(!s||!s.trim()||s==='Sin especificar')return[['Sin especificar',1]];
+  const t=s.replace(/\s+y\s+/gi,',');
+  const parts=t.split(/[,\/]/).map(p=>normPart(p.trim())).filter(Boolean);
+  if(!parts.length)return[[normPart(s.trim()),1]];
+  return parts.map(p=>[p,1/parts.length]);
+}
+function buildMain(){
+  let rows='',tBO=0,tAnn=0,tP2Y=0;
+  APPROVED.forEach(p=>{
+    tBO+=(p.bo||0);tAnn+=(p.ann||0);tP2Y+=(p.p2y||0);
+    const lk=p.link?`<a class="lb" href="${p.link}" target="_blank" rel="noreferrer">BO ↗</a>`:(p.nobo?'<span class="mu" style="font-size:.59rem">Pendiente ***</span>':'—');
+    rows+=`<tr><td><span class="sap">Aprobado</span></td><td>${p.e}</td><td><strong>${p.proj}</strong></td>
+    <td>${p.prov}</td><td>${p.sec}</td>
+    <td class="num">${p.nobo?'<span class="mu">—</span>':FMT(p.bo)}</td><td class="num">${FMT(p.ann)}</td>
+    <td>${p.fadh}</td><td>${p.resol}</td><td>${p.fapr}</td>
+    <td class="num">${p.nobo?'<span class="mu">—</span>':FMT(p.p2y)}</td><td>${lk}</td></tr>`;
+  });
+  REVISION.forEach(p=>{
+    rows+=`<tr><td><span class="srev">En revisión</span></td><td>${p.e}</td><td><strong>${p.proj}</strong></td>
+    <td>${p.prov}</td><td>${p.sec}</td>
+    <td class="num mu">—</td><td class="num">${FMT(p.ann)}</td>
+    <td class="mu">—</td><td class="mu">—</td><td class="mu">—</td><td class="num mu">—</td><td>—</td></tr>`;
+  });
+  document.getElementById('main-tbody').innerHTML=rows;
+  document.getElementById('tot-bo').textContent=FMT(tBO);
+  document.getElementById('tot-ann').textContent=FMT(tAnn);
+  document.getElementById('tot-p2y').textContent=FMT(tP2Y);
+}
+const SECTORS=['Energía','Minería','Industrial','Otros'];
+let SEC_DATA={},PROV_DATA={};
+function aggBySec(){
+  const m={};SECTORS.forEach(s=>m[s]={bo:0,ann:0,p2y:0,rev:0,projects:[]});
+  APPROVED.forEach(p=>{const s=p.sec||'Otros';m[s].bo+=(p.bo||0);m[s].ann+=(p.ann||0);m[s].p2y+=(p.p2y||0);m[s].projects.push({...p,_type:'ap',_frac:1});});
+  REVISION.forEach(p=>{const s=p.sec||'Otros';m[s].rev+=(p.ann||0);m[s].projects.push({...p,_type:'rev',_frac:1});});
+  return m;
+}
+function aggByProv(){
+  const m={};
+  function e(k){if(!m[k])m[k]={bo:0,ann:0,p2y:0,rev:0,projects:[]};}
+  APPROVED.forEach(p=>{splitProv(p.prov).forEach(([pv,fr])=>{e(pv);m[pv].bo+=(p.bo||0)*fr;m[pv].ann+=(p.ann||0)*fr;m[pv].p2y+=(p.p2y||0)*fr;m[pv].projects.push({...p,_type:'ap',_frac:fr});});});
+  REVISION.forEach(p=>{splitProv(p.prov).forEach(([pv,fr])=>{e(pv);m[pv].rev+=(p.ann||0)*fr;m[pv].projects.push({...p,_type:'rev',_frac:fr});});});
+  return m;
+}
+function buildSummary(bodyId,tfootId,data,keys){
+  let html='',tBO=0,tAnn=0,tRev=0,tP2Y=0;
+  keys.forEach(k=>{const d=data[k];if(!d)return;tBO+=d.bo;tAnn+=d.ann;tRev+=d.rev;tP2Y+=d.p2y;
+    html+=`<tr><td><strong>${k}</strong></td><td class="num">${FMT(d.bo)}</td><td class="num">${FMT(d.ann)}</td><td class="num">${d.rev>0?FMT(d.rev):'—'}</td><td class="num">${d.p2y>0?FMT(d.p2y):'—'}</td></tr>`;});
+  document.getElementById(bodyId).innerHTML=html;
+  document.getElementById(tfootId).innerHTML=`<td><strong>Total</strong></td><td class="num"><strong>${FMT(tBO)}</strong></td><td class="num"><strong>${FMT(tAnn)}</strong></td><td class="num"><strong>${FMT(tRev)}</strong></td><td class="num"><strong>${FMT(tP2Y)}</strong></td>`;
+}
+const C_ANN='#8FCCCA',C_BO='#1B5F5E',C_REV='#FEB15F';
+const lblPlugin={id:'lbl',afterDatasetsDraw(chart){
+  const{ctx,data}=chart;const isH=chart.config.options.indexAxis==='y';
+  const annDs=data.datasets.find(d=>d.label==='Ann');const revDs=data.datasets.find(d=>d.label==='Rev');
+  if(!annDs)return;
+  const annMeta=chart.getDatasetMeta(data.datasets.indexOf(annDs));
+  const xSc=chart.scales.x,ySc=chart.scales.y;
+  annMeta.data.forEach((bar,i)=>{
+    const ann=annDs.data[i]||0,rev=revDs?revDs.data[i]||0:0,total=ann+rev;
+    if(!total)return;
+    const txt=total>=1000?(total/1000).toFixed(1)+'k':R(total,0).toLocaleString('es-AR');
+    ctx.save();ctx.fillStyle='#333';ctx.font='bold 9.5px system-ui';
+    if(isH){ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(txt,xSc.getPixelForValue(total)+3,bar.y);}
+    else{ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(txt,bar.x,ySc.getPixelForValue(total)-3);}
+    ctx.restore();
+  });
+}};
+function makeChart(canvasId,labels,boArr,annArr,revArr,isH,onClickFn){
+  // Explicit axis config to ensure category labels show correctly
+  const catAxis={type:'category',stacked:false,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},color:'#333',autoSkip:false,maxRotation:isH?0:30}};
+  const valAxis={type:'linear',stacked:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},color:'#555',callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v.toLocaleString('es-AR')}};
+  return new Chart(document.getElementById(canvasId),{
+    type:'bar',plugins:[lblPlugin],
+    data:{labels,datasets:[
+      {label:'Ann',data:annArr,backgroundColor:C_ANN,stack:'ann',order:3,barPercentage:.72,categoryPercentage:.8},
+      {label:'Rev',data:revArr,backgroundColor:C_REV,stack:'ann',order:3,barPercentage:.72,categoryPercentage:.8},
+      {label:'BO',data:boArr,backgroundColor:C_BO,stack:'bo',order:1,barPercentage:.72,categoryPercentage:.8},
+    ]},
+    options:{
+      indexAxis:isH?'y':'x',grouped:false,responsive:true,maintainAspectRatio:false,
+      layout:{padding:{right:isH?55:8,top:isH?0:16}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:ctx=>{const v=isH?ctx.parsed.x:ctx.parsed.y;if(!v&&v!==0)return null;
+          const l=ctx.dataset.label==='Ann'?'Aprobados (Anunciado)':ctx.dataset.label==='Rev'?'En revisión':'Aprobados (Bol. oficial)';
+          return'  '+l+': '+R(v).toLocaleString('es-AR')+' mill. USD';},
+        footer:()=>['','  ← Clic para ver todos los proyectos']},footerFont:{style:'italic',size:9.5},footerColor:'rgba(255,255,255,.6)'}},
+      scales:isH?{x:valAxis,y:catAxis}:{x:catAxis,y:valAxis},
+      onClick:(e,els)=>{if(els.length)onClickFn(els[0].index);},animation:{duration:450}
+    }
+  });
+}
+function showPanel(title,sub,bodyHtml){
+  document.getElementById('det-title').textContent=title;
+  document.getElementById('det-title').style.color=C_BO;
+  document.getElementById('det-sub').textContent=sub;
+  document.getElementById('det-body').innerHTML=bodyHtml;
+  const p=document.getElementById('det-panel');p.classList.add('on');
+  setTimeout(()=>p.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function closePanel(){document.getElementById('det-panel').classList.remove('on');}
+function secPanel(secName){
+  const d=SEC_DATA[secName];if(!d)return;
+  const rows=d.projects.map(p=>{
+    const isRev=p._type==='rev';
+    const badge=isRev?'<span class="srev">En revisión</span>':'<span class="sap">Aprobado</span>';
+    const lk=p.link?`<a class="lb" href="${p.link}" target="_blank" rel="noreferrer">BO ↗</a>`:'—';
+    return`<tr><td><strong>${p.proj}</strong></td><td class="mu">${p.e}</td><td>${p.prov}</td><td>${badge}</td><td class="num">${isRev?'—':(p.nobo?'Pend.***':FMT(p.bo||0))}</td><td class="num">${FMT(p.ann||0)}</td><td>${lk}</td></tr>`;
+  }).join('');
+  showPanel(secName+' — Todos los proyectos',d.projects.length+' proyectos',
+    `<table><thead><tr><th>Proyecto</th><th>Empresa</th><th>Provincia</th><th>Estado</th><th class="num">Bol. oficial</th><th class="num">Inv. anunciada</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+function provPanel(provName){
+  const d=PROV_DATA[provName];if(!d)return;
+  const hasMulti=d.projects.some(p=>p._frac<1);
+  const rows=d.projects.map(p=>{
+    const isRev=p._type==='rev';const fr=p._frac||1;
+    const badge=isRev?'<span class="srev">En revisión</span>':'<span class="sap">Aprobado</span>';
+    const fracNote=fr<1?` <span style="font-size:.57rem;color:var(--muted)">(${Math.round(fr*100)}% **)</span>`:'';
+    const lk=p.link?`<a class="lb" href="${p.link}" target="_blank" rel="noreferrer">BO ↗</a>`:'—';
+    return`<tr><td><strong>${p.proj}</strong>${fracNote}</td><td class="mu">${p.e}</td><td>${badge}</td><td class="num">${isRev?'—':(p.nobo?'Pend.***':FMT((p.bo||0)*fr))}</td><td class="num">${FMT((p.ann||0)*fr)}</td><td>${lk}</td></tr>`;
+  }).join('');
+  const note=hasMulti?'<div style="font-size:.59rem;color:var(--muted);margin-top:.45rem;">** Monto asignado a esta provincia: fracción proporcional dividida en partes iguales entre las provincias involucradas.</div>':'';
+  showPanel(provName+' — Todos los proyectos',d.projects.length+' proyectos',
+    `<table><thead><tr><th>Proyecto</th><th>Empresa</th><th>Estado</th><th class="num">Bol. oficial (asignado)</th><th class="num">Anunciado (asignado)</th><th>Link</th></tr></thead><tbody>${rows}</tbody></table>${note}`);
+}
+buildMain();
+SEC_DATA=aggBySec();buildSummary('sec-tbody','sec-tfoot',SEC_DATA,SECTORS);
+const secBO=SECTORS.map(s=>R(SEC_DATA[s]?.bo||0));
+const secAnn=SECTORS.map(s=>R(SEC_DATA[s]?.ann||0));
+const secRev=SECTORS.map(s=>R(SEC_DATA[s]?.rev||0));
+makeChart('chart-sec',SECTORS,secBO,secAnn,secRev,false,i=>secPanel(SECTORS[i]));
+PROV_DATA=aggByProv();
+const provKeys=Object.keys(PROV_DATA).sort((a,b)=>(PROV_DATA[b].ann+PROV_DATA[b].rev)-(PROV_DATA[a].ann+PROV_DATA[a].rev));
+buildSummary('prov-tbody','prov-tfoot',PROV_DATA,provKeys);
+const provBO=provKeys.map(k=>R(PROV_DATA[k].bo));
+const provAnn=provKeys.map(k=>R(PROV_DATA[k].ann));
+const provRev=provKeys.map(k=>R(PROV_DATA[k].rev));
+makeChart('chart-prov',provKeys,provBO,provAnn,provRev,true,i=>provPanel(provKeys[i]));
+</script>
+</body>
+</html>
